@@ -3,11 +3,12 @@ from turtle import title
 from typing import Collection
 from django.db import models
 
-class Promotion():
+class Promotion(models.Model): 
     description = models.CharField(max_length=255)
     discount = models.FloatField()
 class Collection(models.Model):
     title = models.CharField(max_length=255)
+    featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
 
 class Product(models.Model):
@@ -16,7 +17,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(Collection,on_delete=models.PROTECT)
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
     promotions = models.ManyToManyField(Promotion)
 
 class Customer(models.Model):
@@ -58,12 +59,12 @@ class OrderItem(models.Model):
 class Address(models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
-    customer = models.OneToOneField(Customer,on_delete=models.CASCADE, primary_key=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
-class CartItem():
-    cart = models.ForeignKey(Product, on_delete=models.CASCADE)
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
